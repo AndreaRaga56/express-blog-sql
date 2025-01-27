@@ -1,28 +1,47 @@
-import blogPosts from "../content.js";
+import connection from "../data/db.js";
 
 function index(req, res) {
     const filterTag = req.query.tags;
-    let postDaMostrare = blogPosts;
-    if (filterTag !== undefined) {
-        postDaMostrare = blogPosts.filter((curElem, i) => (blogPosts[i].tags.includes(filterTag)));
-    }
-    const bacheca = {
-        blogPosts: postDaMostrare,
-        tot: postDaMostrare.length
-    };
-    res.json(bacheca);
+    const sql = "SELECT * FROM `posts`"
+    connection.query(sql, (err, result) => {
+        if (err) {
+            return res.status(500).json({
+                message: "Errore interno del server",
+            });
+        } else {
+            let postDaMostrare = result
+            if (filterTag !== undefined) {
+                postDaMostrare = result.filter((curElem, i) => (blogPosts[i].tags.includes(filterTag)));
+            }
+            res.status(200).json({
+                status: "success",
+                tot: postDaMostrare.length,
+                data: postDaMostrare,
+            });
+        }
+    })
 }
 
 function show(req, res) {
     const postId = parseInt(req.params.id);
-    let answer = 0;
-    for (let i = 0; i < blogPosts.length; i++) {
-        if (blogPosts[i].id === postId) {
-            answer = blogPosts[i];
-            break
+    const sql = "SELECT * FROM `posts` WHERE `id`=?"
+    connection.query(sql, [postId], (err, result) => {
+        if (err) {
+            return res.status(500).json({
+                message: "Errore interno del server",
+            });
+        } else {
+            let answer = 0;
+            for (let i = 0; i < result.length; i++) {
+                if (result[i].id === postId) {
+                    answer = result[i];
+                    break
+                }
+            }
+            res.json(answer);
         }
-    }
-    res.json(answer);
+    });
+
 };
 
 function store(req, res) {
@@ -88,16 +107,33 @@ function modify(req, res) {
 
 function destroy(req, res) {
     const postId = parseInt(req.params.id);
-    let indexDaEliminare;
-    for (let i = 0; i < blogPosts.length; i++) {
-        if (blogPosts[i].id === postId) {
-            indexDaEliminare = i;
-            break
-        }
-    }
-    blogPosts.splice(indexDaEliminare, 1);
+    const sql = "DELETE FROM `posts` WHERE `id`=?"
+    const sql1 = "SELECT * FROM `posts`"
+    connection.query(sql1, (err1, result1) => {
+        if (err1) {
+            return res.status(500).json({
+                message: "Errore interno del server",
+            });
+        } else {
 
-    res.json(blogPosts)
+            for (let i = 0; i < result1.length; i++) {
+                if (result1[i].id === postId) {
+                    connection.query(sql, [i], (err, result) => {
+                        if (err) {
+                            return res.status(500).json({
+                                message: "Errore interno del server",
+                            });
+                        } else {
+                            result1.splice(i, 1);
+                            res.json(result1)
+                        }
+                    });
+                }
+            }
+        }
+    });
+
+
 };
 
 export default { index, show, store, update, modify, destroy };

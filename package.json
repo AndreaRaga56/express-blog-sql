@@ -1,5 +1,17 @@
 {
+  "name": "express-blog-api-crud",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node --watch app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "type": "module",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.21.2",
     "mysql2": "^3.12.0"
   }

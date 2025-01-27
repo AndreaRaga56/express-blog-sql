@@ -1,7 +1,7 @@
 import blogPosts from "../content.js"
 
 //Gestore di errori nei parametri
-const checkIdExists = (req, res, next) =>{
+const checkIdExists = (req, res, next) => {
     const postId = parseInt(req.params.id);
     let answer = false;
     for (let i = 0; i < blogPosts.length; i++) {
@@ -10,13 +10,13 @@ const checkIdExists = (req, res, next) =>{
             break
         }
     }
-    if (answer===false) {
-        res.statusCode =404;
+    if (answer === false) {
+        res.statusCode = 404;
         res.json({
             error: true,
             message: "Post non trovato"
         })
-    } else{
+    } else {
         next()
     }
 }
