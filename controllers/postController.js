@@ -107,33 +107,16 @@ function modify(req, res) {
 
 function destroy(req, res) {
     const postId = parseInt(req.params.id);
-    const sql = "DELETE FROM `posts` WHERE `id`=?"
-    const sql1 = "SELECT * FROM `posts`"
-    connection.query(sql1, (err1, result1) => {
-        if (err1) {
+    const sql = "DELETE FROM `posts` WHERE `id`=?";
+    connection.query(sql, [postId], (err, result) => {
+        if (err) {
             return res.status(500).json({
                 message: "Errore interno del server",
             });
         } else {
-
-            for (let i = 0; i < result1.length; i++) {
-                if (result1[i].id === postId) {
-                    connection.query(sql, [i], (err, result) => {
-                        if (err) {
-                            return res.status(500).json({
-                                message: "Errore interno del server",
-                            });
-                        } else {
-                            result1.splice(i, 1);
-                            res.json(result1)
-                        }
-                    });
-                }
-            }
-        }
+            res.json(true);
+        };
     });
-
-
 };
 
 export default { index, show, store, update, modify, destroy };
